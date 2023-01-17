@@ -1,0 +1,116 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
+}
+
+ext {
+    project_name = "alchemical-metallurgic-converter"
+    minecraft_version = '1.19.2'
+    forge_version = '43.2.3'
+    botania_version = '1.19.2-436-FORGE'
+    patchouli_verison = '1.19.2-76'
+    curios_version = '1.19.2-5.1.1.0'
+}
+
+group = 'banana.cheese.blue'
+version = "${minecraft_version}-0.1.0"
+
+java {
+    archivesBaseName = 'alchemical-metallurgic-infuser'
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'alchemicalmetallurgicinfuser'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+            mods {
+                alchemicalmetallurgicinfuser {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'alchemicalmetallurgicinfuser'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+            mods {
+                alchemicalmetallurgicinfuser {
+                    source sourceSets.main
+                }
+            }
+        }
+        gameTestServer {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'alchemicalmetallurgicinfuser'
+            mods {
+                alchemicalmetallurgicinfuser {
+                    source sourceSets.main
+                }
+            }
+        }
+        data {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                alchemicalmetallurgicinfuser {
+                    source sourceSets.main
+                }
+            }
+            args '--mod', 'alchemicalmetallurgicinfuser', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    maven {
+        url 'https://maven.blamejared.com'
+    }
+    maven {
+        url "https://maven.theillusivec4.top/"
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    compileOnly fg.deobf("vazkii.botania:Botania:${botania_version}:api")
+    runtimeOnly fg.deobf("vazkii.botania:Botania:${botania_version}")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_verison}:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_verison}")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "alchemicalmetallurgicinfuser",
+                "Specification-Vendor"    : "luhegi, quarris",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "luhegi, quarris",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
